@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 )
 
 func assert(err error) {
@@ -32,7 +33,7 @@ func main() {
 	lines := 0
 	for line, err := reader.Read(); err != io.EOF; line, err = reader.Read() {
 		q := problem{line[0], strings.TrimSpace(line[1])}
-		if evalProblem(q) {
+		if evalOrExit(q) {
 			correct++
 		}
 		lines++
@@ -40,12 +41,25 @@ func main() {
 	fmt.Printf("your score is %d out of %d\n", correct, lines)
 }
 
-func evalProblem(p problem) bool {
+func evalOrExit(p problem) bool {
+	ch := make(chan bool, 1)
+	go evalProblem(p, ch)
+	select {
+	case ans := <-ch:
+		return ans
+	case <-time.After(2 * time.Second):
+		fmt.Println("Time out ): try harder")
+		os.Exit(0)
+	}
+	return false
+}
+
+func evalProblem(p problem, ch chan bool) {
 	fmt.Printf("the quiestion is : %s?\n", p.question)
 	var ans string
 	fmt.Scan(&ans)
 	if ans == p.answer {
-		return true
+		ch <- true
 	}
-	return false
+	ch <- false
 }
