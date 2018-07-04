@@ -7,22 +7,35 @@ import (
 )
 
 func TestParseLinks(t *testing.T) {
-	filenames := [...]string{"ex2.html"}
+	filenames := [...]string{"ex1.html", "ex2.html", "ex3.html", "ex4.html"}
 
-	expected := []Link{
-		Link{"https://www.twitter.com/joncalhoun", "Check me out on twitter <i class=\"fa fa-twitter\" aria-hidden=\"true\"></i>"},
-		Link{"https://github.com/gophercises", "Gophercises is on <strong>Github</strong>!"},
+	expected := [][]Link{
+		[]Link{
+			Link{"/other-page", "A link to another page"},
+		},
+		[]Link{
+			Link{"https://www.twitter.com/joncalhoun", "Check me out on twitter"},
+			Link{"https://github.com/gophercises", "Gophercises is on Github!"},
+		},
+		[]Link{
+			Link{"#", "Login"},
+			Link{"/lost", "Lost? Need help?"},
+			Link{"https://twitter.com/marcusolsson", "@marcusolsson"},
+		},
+		[]Link{
+			Link{"/dog-cat", "dog cat"},
+		},
 	}
 
-	for _, name := range filenames {
+	for i, name := range filenames {
 		file, err := os.Open("test_data/" + name)
 		if err != nil {
 			t.Errorf("Provided test file does not exist: %v\n", err)
 		}
 		defer file.Close()
 		actual, err := ParseLinks(file)
-		if !reflect.DeepEqual(actual, expected) {
-			t.Fail()
+		if !reflect.DeepEqual(actual, expected[i]) {
+			t.Errorf("failed to parse %v", name)
 		}
 	}
 }
