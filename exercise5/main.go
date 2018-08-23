@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"./parser"
+	"github.com/pin3da/gophercises/exercise4"
 )
 
 const xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9"
